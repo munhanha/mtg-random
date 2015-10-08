@@ -1,0 +1,46 @@
+{% extends "main_base.html" %}
+
+
+{% block body %}
+
+<div class="span12">
+
+<div class="span4">
+
+	
+<div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">Menu</li>
+              <li><a onclick="enable_saldo_utilizador()" href="javascript:void(0);">Carregar Utilizador(Saldo)</a></li>
+			  <li><a onclick="adicionar_edicao()" href="javascript:void(0);">Adicionar edi&ccedil;&atilde;o</a></li>
+			  <li><a onclick="enable_stock_carta()" href="javascript:void(0);">Alterar parametros de uma carta</a></li>
+              <li><a onclick="enable_alter_stock()" href="javascript:void(0);">Encomendas</a></li>
+              <li><a onclick="enable_alter_payments()" href="javascript:void(0);">Pagamentos</a></li>
+              <li><a onclick="enable_empty_cart()" href="javascript:void(0);">Esvaziar Carrinho</a></li>
+              <li><a href="/sair">Logout</a></li>
+            </ul>
+          </div>
+		  
+<p></p>		  
+<div id="changer_message" class="span4"></div>
+<p></p>
+<b></b>
+
+<div id="alterator" class="span4">
+
+
+</div>
+
+</div>
+
+
+
+{% block body_admin %}
+
+
+{% endblock %}
+
+
+{% endblock %}
+
+</div>

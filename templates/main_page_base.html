@@ -1,0 +1,53 @@
+{% extends "main_base.html" %}
+
+
+{% block javascript %}
+
+
+{% endblock %}
+
+
+{% block body %}
+<div class="span18">
+
+
+
+<div class="span2">
+
+	
+<div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">Menu</li>
+			  {% block main_user_page_active %}<li><a href="main">P&aacute;gina Principal</a></li>{% endblock %}
+			  {% block comprar_cartas_active %}<li><a href="main_page">Comprar Cartas (Random) </a></li>{% endblock %}
+			  {% block comprar_cartas_store_active %}<li><a href="store">Comprar Cartas (Store) </a></li>{% endblock %}
+			  {% block view_cards_active %}<li><a href="view_cards">Finalizar Encomenda</a></li>{% endblock %}
+			  {% block carregamento_active %}<li><a href="payment">Carregar Conta</a></li>{% endblock %}
+			  {% block ver_historico_active %}<li><a href="orders">Ver hist&oacute;rico</a></li>{% endblock %}
+			  {% block last_order_active %}<!--li><a href="success_checkout">&Uacute;ltima encomenda</a></li-->{% endblock %}
+			  <li class="nav-header">Conta</li>
+			  {% block mudar_password_active %}<li><a href="change_password">Mudar password</a></li>{% endblock %}
+              {% block alterar_informacao_active %}<li><a href="change_info">Alterar informa&ccedil;&atilde;o pessoal</a></li>{% endblock %}
+			  {% block transferir_saldo %}<li><a href="transfer_credit">Transferir saldo entre utilizadores</a></li>{% endblock %}
+              <li><a href="sair">Logout</a></li>
+            </ul>
+          </div>
+		  		  
+		  
+		  
+{% block under_menu %}		  
+
+
+{% endblock %}
+		  
+</div>
+
+{% block main_page_body %}
+
+
+{% endblock %}
+
+
+</div>
+
+{% endblock %}

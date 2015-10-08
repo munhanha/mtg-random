@@ -1,0 +1,99 @@
+{% extends "main_base.html" %}
+
+
+{% block javascript %}
+
+
+{% endblock %}
+
+
+
+
+
+
+
+{% block body %}
+
+ 
+<div class="span12">
+
+<div class="span3">
+ 
+	<form class="well form-inline" action="/start" method="post">
+	<div>
+	<input name="username" class="input-medium search-query" id="username" type="text" placeholder="E-mail">
+	<div>
+	<p></p>
+	<input name="password" class="input-medium search-query" id="password" type="password" placeholder="Password">
+	</div>
+	<p></p>
+	<button type="submit" id="do_login" class="btn btn-primary">Login</button>
+	</form>
+</div>
+
+	
+	<button onclick="location.href='/register.html'" class="btn btn-large btn-info">Criar Conta</button> 
+	<a href="/recover_password">(Recuperar password)</a>
+	
+	<p></p>
+	
+	{% if error %}
+		<span class="label label-important">{{error}}</span>
+	{% endif %}	
+	
+	{% if info %}
+		<span class="label label-info">{{info}}</span>
+	{% endif %}	
+	
+	
+	
+	<p></p>
+	
+		<div class="alert alert-success">
+			<center>
+			<strong> AVISO: </strong>
+			<p></p>
+			Crie hoje a sua conta e ganhe 25 cr&eacute;ditos gr&aacute;tis!
+			<p></p>
+			<strong>BE LUCKY</strong>
+			</center>
+		</div>
+	
+</div><!--/span-->
+
+
+ <div class="span8">
+	 <div class="row-fluid">
+            <div class="span4">
+			<div class="well">
+			<h2>Comprar na Loja</h2>
+			  <p>  </p>
+              <p> N&atilde;o necessitas de ter cr&eacute;ditos para fazeres a tua encomenda.</p>
+              <p> S&oacute; pesquisar, adicionar ao carrinho e terminar a encomenda. </p>
+			  <br></br>
+            </div>
+            </div>
+            <div class="span4">
+			<div class="well">
+				<h2>Comprar Random</h2>	
+					<p> Compras cartas de forma aleat&oacute;ria a pre&ccedil;os reduzidos, e se n&atilde;o gostares podes sempre vender a carta de volta. </p>
+					<br></br>
+					<p>&#160;</p>
+            </div>
+            </div>
+            <div class="span4">
+			<div class="well">
+			<b><h2>PROMO&Ccedil;&Otilde;ES</h2></b>
+			<p> Carrega 1000 cr&eacute;ditos ou mais e recebe logo 5% de b&oacute;nus.</p>
+			<br></br>
+            </div>
+
+			</div>
+
+		
+
+          </div><!--/row-->
+ 
+ </div><!--/span-->
+ 
+{% endblock %}

@@ -1,0 +1,553 @@
+{% extends "main_base_admin.html" %}
+
+
+{% block javascript %}
+
+
+function success(message) {
+		$('#changer_message').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Sucesso: </strong>'+ message +'</div>');
+	}
+function error(message) {
+		$('#changer_message').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Erro: </strong>'+ message +'</div>');
+	}
+	
+function enable_empty_cart() {
+	$('#alterator').empty();
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Email do Utilizador: <input name="username_to_empty" class="input-medium search-query" id="username_empty_cart" type="text" placeholder="E-mail do utilizador"> <br></br> <button onclick="admin_empty_cart()" id="empty_cart" class="btn btn-success">Esvaziar carrinho!</button>');
+	$('#alterator').append('<p></p>');
+} 	
+
+function admin_empty_cart() {
+
+$('#empty_cart').attr("disabled", true);
+
+var user = document.getElementById("username_empty_cart").value;
+
+
+$.post("/admin_sell_all", { user: user},
+	function(data) {
+	
+			var info = data.split("###");
+			
+			if (info[0] == "Error")
+				error(info[1]);
+			else
+				success(info[1]);
+			
+		$('#empty_cart').attr("disabled", false);	
+	});
+}
+
+
+
+function enable_saldo_utilizador() {
+	$('#alterator').empty();
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Email do Utilizador: <input name="username" class="input-medium search-query" id="username_saldo_carregar" type="text" placeholder="E-mail do utilizador"> <p></p> Saldo a adicionar: <input name="valor" class="input-mega-mini search-query" id="valor_saldo_carregar" type="text" placeholder="valor"> <p></p> <button onclick="carregar_saldo()" id="carregar" class="btn btn-success">Carregar Utilizador</button>');
+	$('#alterator').append('<p></p>');
+} 
+
+function carregar_saldo() {
+
+$('#carregar').attr("disabled", true);
+
+
+var username_saldo_carregar = document.getElementById("username_saldo_carregar").value;
+var valor_saldo_carregar = document.getElementById("valor_saldo_carregar").value;
+
+$.post("/update_saldo", 
+	{ email: username_saldo_carregar , saldo: valor_saldo_carregar},
+	function(data) {
+	
+		if (data == "Efectuado com sucesso")
+			$('#changer_message').html('<p></p><span class="label label-success">Efectuado com sucesso</span>')
+		else
+			$('#changer_message').html('<p></p><span class="label label-important">' + data + '</span>')
+			
+		$('#carregar').attr("disabled", false);	
+	});
+}
+
+function enable_alter_payments() {
+	$('#alterator').empty();
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Email do Utilizador: <input name="username" class="input-medium search-query" id="username_payment_confirm" type="text" placeholder="E-mail do utilizador"> <p></p> <button onclick="confirm_payment()" id="confirm_payment" class="btn btn-success">Confirmar Pagamento</button>');
+	$('#alterator').append('<p></p>');
+
+}
+
+function confirm_payment(){
+
+	var user = document.getElementById("username_payment_confirm").value;
+
+
+	$.post("/admin_payment_confirmation", 
+		{ user: user },
+			function(data) {
+			
+			var info = data.split("###");
+			
+			if (info[0] == "Error")
+				error(info[1]);
+			else
+				success(info[1]);
+				
+		});
+
+}
+
+
+function adicionar_edicao(){
+	$('#loadEdition').html('<div class="controls"> <textarea class="input-xlarge" id="cards" rows="50" cols="1000"></textarea> </div>')
+	$('#loadEdition').append('<button onclick="addCardsToDB()" id="add_edition" class="btn btn-success">Load</button>')
+} 
+
+
+//adds cards to DB
+function addCardsToDB(){
+
+$('#add_edition').attr("disabled", true);
+
+var raw_cards = document.getElementById("cards").value;
+
+var cards = raw_cards.split("\n");
+
+var size_edition = cards.length
+
+for(i = 0; cards.length-1 ; i++){
+
+	var single_card_info = cards[i].split("###");
+	
+	var name = single_card_info[0]
+	var colour = single_card_info[1]
+	var cost = single_card_info[2]
+	var type = single_card_info[3]
+	var power_resistance = single_card_info[4]
+	var text = single_card_info[5]
+	var rarity = single_card_info[6]
+	var edition = single_card_info[7]
+	var stock = single_card_info[8]
+	var importance = single_card_info[9]
+	
+	var count = 0;
+	
+	
+	$.post("/add_card_db", 
+		{ name: name , colour: colour, cost: cost, type: type, power_resistance: power_resistance, text: text, rarity: rarity, edition: edition, stock:stock, importance:importance},
+			function(data) {
+			
+			console.log(data);
+			
+			if(size_edition-1 == count){
+				$('#add_edition').attr("disabled", false);
+				
+				}
+			else{
+				count += 1;
+			}
+		});
+}
+
+
+
+} // end addCardsToDB
+
+
+function enable_stock_carta() {
+
+	$('#alterator').empty();
+	$('#alterator').append('Nome carta: <input name="carta" class="input-medium search-query" id="carta" type="text" placeholder="Nome da carta">');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Stock da carta: <input name="stock" class="input-small search-query" id="stock" type="text" placeholder="Stock">');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Importancia da carta: <input name="importancia" class="input-small search-query" id="importancia" type="text" placeholder="Importancia">');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('Valor real da carta: <input name="valor_real" class="input-small search-query" id="valor_real" type="text" placeholder="Valor real(creditos)">');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('<button onclick="carregar_stock_importance_carta()" id="alterar_stock_importancia_carta" class="btn btn-success">Alterar</button>');
+} 
+
+function enable_alter_stock() {
+
+	$('#alterator').empty();
+	$('#alterator').append('Numero Encomenda: <input name="order" class="input-mini search-query" id="order" type="text" placeholder="Encomenda">');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('<td> <select id="order_type" class="span2"><option>Por Processar</option><option>Pagamento Aceite</option><option>Processado</option><option>Enviado</option></select></td>');
+	$('#alterator').append('<p></p>');
+	$('#alterator').append('<button onclick="change_state_order()" id="change_state_order" class="btn btn-success">Alterar</button>');
+} 
+
+//changes stock and/or importance of given card
+function carregar_stock_importance_carta() {
+
+$('#alterar_stock_importancia_carta').attr("disabled", true);
+
+$('#changer_message').empty();
+
+var carta = document.getElementById("carta").value;
+var stock = document.getElementById("stock").value;
+var importancia = document.getElementById("importancia").value;
+var valor_real = document.getElementById("valor_real").value;
+
+
+
+$.post("/change_card_stock_importance", 
+	{ carta: carta , stock: stock, importancia: importancia, valor_real: valor_real},
+	function(data) {
+	
+		if (data == "Efectuado com sucesso")
+			$('#changer_message').html('<p></p> <center> <span class="label label-success">Efectuado com sucesso</span> </center>  <p></p> ')
+		else
+			$('#changer_message').html('<p></p> <center> <span class="label label-important">' + data + '</span> </center> <p></p> ')
+			
+		$('#alterar_stock_importancia_carta').attr("disabled", false);
+	});
+}
+
+
+//changes order state
+function change_state_order() {
+
+$('#change_state_order').attr("disabled", true);
+
+$('#changer_message').empty();
+
+var order = document.getElementById("order").value;
+var new_state = document.getElementById("order_type").value;
+
+
+$.post("/change_order_state", 
+	{ order: order , new_state: new_state},
+	function(data) {
+	
+		if (data == "Efectuado com sucesso")
+			$('#changer_message').html('<p></p> <center> <span class="label label-success">Efectuado com sucesso</span> </center>  <p></p> ')
+		else
+			$('#changer_message').html('<p></p> <center> <span class="label label-important">' + data + '</span> </center> <p></p> ')
+			
+		$('#change_state_order').attr("disabled", false);
+	});
+}
+
+
+
+ 
+//seach for users
+function ValidateAndSend() {
+
+$('#user_search').attr("disabled", true);
+
+
+$('#tab_users').empty();
+$('#changer_message').empty();
+
+var keywords = document.getElementById("user_keywords").value;
+
+if(keywords == "") {
+	alert("Campo vazio");
+	$('#user_search').attr("disabled", false);
+	return;
+}
+
+$.post("/search_users",
+	{ keywords: keywords},
+	function(data) {
+	
+		$('#tab_users').append(data);		
+		
+		$('#user_search').attr("disabled", false);
+		
+	});
+} // end ValidateAndSend
+ 
+//clears user table 
+function cleanUserTable() {
+	$('#tab_users').empty();
+} 
+
+//clears card table
+function cleanCardTable() {
+	$('#tab_cards').empty();
+}
+
+//clears order table
+function cleanOrdersTable() {
+	$('#tab_orders').empty();
+}
+
+//clears payment table
+function cleanPaymentTable() {
+	$('#tab_pagamentos').empty();
+}
+
+//clears cart table
+function cleanUserCartTable() {
+	$('#tab_cart').empty();
+}
+
+//search for cards
+function ValidateCardAndSend() {
+
+$('#card_search').attr("disabled", true);
+
+$('#tab_cards').empty();
+$('#changer_message').empty();
+
+var keywords = document.getElementById("card_keywords").value;
+
+if(keywords == "") {
+	alert("Campo vazio");
+	$('#card_search').attr("disabled", false);
+	return;
+}
+
+$.post("/search_cards_admin",
+	{ keywords: keywords},
+	function(data) {
+	
+		$('#tab_cards').append(data);
+		
+		$('#card_search').attr("disabled", false);
+		
+	});
+} 
+
+
+
+//search for orders
+function ValidateOrdersAndSend() {
+
+$('#order_search').attr("disabled", true);
+
+$('#tab_orders').empty();
+$('#changer_message').empty();
+
+var keywords = document.getElementById("orders_keywords").value;
+var order_type = document.getElementById("order_type_normal").value;
+
+
+$.post("/search_orders_admin",
+	{ keywords: keywords, order_type:order_type},
+	function(data) {
+	
+		$('#tab_orders').append(data);
+		
+		$('#orders_search').attr("disabled", false);
+		
+	});
+} 
+
+//get all payments
+function GetTotalPayments() {
+
+
+$('#totalPayments').attr("disabled", true);
+
+$('#tab_pagamentos').empty();
+$('#changer_message').empty();
+
+
+$.post("/admin_view_payments",
+	function(data) {
+	
+		$('#tab_pagamentos').append(data);
+		
+		$('#totalPayments').attr("disabled", false);
+	});
+}
+
+//get all payments
+function ValidateUserCartAndSend() {
+
+
+$('#user_cart').attr("disabled", true);
+
+$('#tab_cart').empty();
+$('#changer_message').empty();
+
+var user = document.getElementById("user_cart").value;
+
+$.post("/admin_view_user_cart",
+	{ user: user},
+	function(data) {
+	
+		$('#tab_cart').append(data);
+		
+		$('#user_cart').attr("disabled", false);
+	});
+}
+
+
+ 
+{% endblock %}
+
+
+{% block body_admin %}
+
+
+<div class="span7">
+
+	<p></p>
+	 <h4> Procurar utilizadores </h4>
+	<p></p>  
+
+	<!--input name="username" class="input-medium search-query" id="username" type="text" placeholder="E-mail do utilizador"-->
+	<p></p>
+	<input name="user_keywords" class="input-medium search-query" id="user_keywords" type="text" placeholder="Key words do utilizador">
+	<button onclick="ValidateAndSend()" id="user_search" class="btn btn-success">Procurar</button>
+	<button onclick="cleanUserTable()" id="clear_user_search" class="btn btn-danger">Limpar</button>
+	<p></p>
+	
+	<p></p>
+	
+	<table class="table table-striped table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>E-mail</th>
+            <th>Nome</th>
+            <th>Morada</th>
+			<th>Cod-postal</th>
+			<th>Telefone</th>
+			<th>Saldo</th>
+			<th>Pa&iacute;s</th>
+			<th>Compras total</th>
+			<th>Comum</th>
+			<th>Incomuns</th>
+			<th>Raras</th>
+          </tr>
+        </thead>
+        <tbody id="tab_users">
+        </tbody>
+      </table>
+	  
+	  <p></p>
+	  
+	<p></p>
+	 <h4> Procurar cartas </h4>
+	<p></p>  
+	  
+	<input name="user_keywords" class="input-medium search-query" id="card_keywords" type="text" placeholder="Key words da carta">
+	<button onclick="ValidateCardAndSend()" id="card_search" class="btn btn-success">Procurar</button>
+	<button onclick="cleanCardTable()" id="user_search" class="btn btn-danger">Limpar</button>
+	<p></p>
+	  
+	  <table class="table table-striped table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cor</th>
+            <th>Custo</th>
+			<th>Tipo</th>
+			<th>Poder/Resistencia</th>
+			<!--th>Texto</th-->
+			<th>Raridade</th>
+            <th>Edi&ccedil;&atilde;o</th>
+			<th>Stock</th>
+			<th>Importancia</th>
+			<th>Valor Real</th>
+          </tr>
+        </thead>
+        <tbody id="tab_cards">
+        </tbody>
+      </table>
+	  
+	<p></p> 
+	
+	<p></p>
+		<h4> Ver encomendas </h4>
+	<p></p>
+	
+	<input name="order_keywords" class="input-medium search-query" id="orders_keywords" type="text" placeholder="Key words da encomenda">
+	<select id="order_type_normal" class="span2">
+		<option>Por Processar</option>
+		<option>Pagamento Aceite</option>
+		<option>Processado</option>
+		<option>Enviado</option>
+		</select>
+	<button onclick="ValidateOrdersAndSend()" id="orders_search" class="btn btn-success">Procurar</button>
+	<button onclick="cleanOrdersTable()" class="btn btn-danger">Limpar</button>
+	<p></p>
+	
+	  <table class="table table-striped table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Codigo</th>
+            <th>Metodo</th>
+			<th>Estado</th>
+			<th>Morada</th>
+			<th>Pais</th>
+			<th>Codigo-Postal</th>
+            <th>Telefone</th>
+			<th>Data</th>
+			<th>Cartas</th>
+          </tr>
+        </thead>
+        <tbody id="tab_orders">
+        </tbody>
+      </table>
+	  
+	  
+	  <p></p> 
+	
+	
+	<p></p>
+	<h4> Ver carregamentos pendentes </h4>
+	<p></p>
+	
+	<button onclick="GetTotalPayments()" id="totalPayments" class="btn btn-success">Ver pedidos de carregamento</button>
+	<button onclick="cleanPaymentTable()" class="btn btn-danger">Limpar</button>
+	<p></p>
+	
+	  <table class="table table-striped table-bordered table-condensed">
+        <thead>
+          <tr>
+			<th>User</th>
+            <th>M&eacute;todo</th>
+			<th>Valor</th>
+			<th>Moeda</th>
+			<th>Data</th>
+          </tr>
+        </thead>
+        <tbody id="tab_pagamentos">
+        </tbody>
+      </table>
+	  
+	  
+	  
+	  
+	<p></p>
+	 <h4> Ver carrinho utilizador </h4>
+	<p></p>
+	  
+	<input name="userCart" class="input-medium search-query" id="user_cart" type="text" placeholder="User">
+	<button onclick="ValidateUserCartAndSend()" id="user_cart_search" class="btn btn-success">Procurar</button>
+	<button onclick="cleanUserCartTable()" class="btn btn-danger">Limpar</button>
+	<p></p>
+	  
+	  <table class="table table-striped table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Raridade</th>
+            <th>Edicao</th>
+            <th>Ultima compra/venda</th>
+          </tr>
+        </thead>
+        <tbody id="tab_cart">
+        </tbody>
+      </table>
+	
+	
+</div>
+
+
+
+<div  id="loadEdition" class="span12">
+
+
+</div>
+
+
+{% endblock %}

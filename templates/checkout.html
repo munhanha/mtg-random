@@ -1,0 +1,238 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+
+
+
+
+function finish_checkout() {
+
+
+	var option1 = document.getElementById("option1").value;
+	var option2 = null;
+	
+	try{
+	option2 = document.getElementById("option2").value;
+	}catch(err){}
+	
+	var option = null;
+	
+	if(document.getElementById("option1").checked==true)
+		option = document.getElementById("option1").value
+	if(option2 != null)	
+	if(document.getElementById("option2").checked==true)
+		option = document.getElementById("option2").value
+	
+	var is_random = "false";
+	var is_store = "false";
+	
+	{% if cartas_random %}
+	is_random = "true";
+	{% endif %}
+	{% if cartas_store %}
+	is_store = "true";
+	{% endif %}
+	
+	
+	var what_to_send = null;
+	
+	
+	if(is_random == "true" && is_store == "false"){
+		what_to_send = "Random";
+		}
+	if(is_random == "false" && is_store == "true"){
+		what_to_send = "Store";	
+		console.log(what_to_send);
+		}
+	
+	if(is_random == "false" && is_store == "false"){
+		alert("Tem de ter cartas em algum dos seus carrinhos!");
+		window.location = "/main";
+		}
+	
+	if(what_to_send == null){
+		if(document.getElementById('order_all').checked) {
+			what_to_send = document.getElementById('order_all').value;
+			
+		}else if(document.getElementById('order_random').checked) {
+		
+			what_to_send = document.getElementById('order_random').value;
+		}	
+		else{
+			what_to_send = document.getElementById('order_store').value;
+		}
+	}
+	
+	
+	$.post("/complete_checkout",
+		{ option: option, what_to_send: what_to_send},
+	function(data) {
+	
+		if(data == "Success")
+			window.location = "/success_checkout";
+		else{
+
+			alert(data);
+
+			}
+		});
+}
+
+
+{% endblock %}
+
+
+
+{% block under_menu %}	
+	<!--center><h3 id="saldo_utilizador">O seu saldo &eacute; {{saldo}} {{moeda|safe}}</h3></center>
+	
+	
+	<br></br-->
+	
+	
+{% endblock %}
+
+
+{% block main_page_body %}
+
+	<div class="span8">
+
+	
+	{% if no_cards %}
+		<h2> N&acirc;o tem cartas no seu carrinho </h2>
+	
+	{% else %}
+	
+	{% if cartas_random %}
+	<h3> Cartas que tem no seu carrinho Random</h3> 
+	<p></p>
+	
+	<table class="table table" border="0">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Edi&ccedil;&atilde;o</th>
+            <th>Raridade</th>
+            <th>Quantidade</th>
+          </tr>
+        </thead>
+        <tbody>
+			{% for carta in cartas_random %}
+			<tr id="{{forloop.counter}}">
+			<td><a href="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{carta.nome}} &amp;size=small&amp;options=" target="_blank">{{carta.nome}}</a></td>
+            <td>{{carta.edicao}}</td>
+            <td>{{carta.raridade}}</td>
+            <td>1</td>
+          </tr>
+			{% endfor %}
+        </tbody>
+      </table>
+	  
+	  <hr>
+	  
+	  {% endif %}
+	  
+	  {% if cartas_store %}
+	  <h3> Cartas que tem no seu carrinho Store</h3> 
+		<p></p>
+	  
+	  	<table class="table table" border="0">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Edi&ccedil;&atilde;o</th>
+            <th>Raridade</th>
+            <th>Quantidade</th>
+          </tr>
+        </thead>
+        <tbody>
+			{% for carta in cartas_store %}
+			<tr id="{{forloop.counter}}">
+			<td><a href="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{carta.nome}} &amp;size=small&amp;options=" target="_blank">{{carta.nome}}</a></td>
+            <td>{{carta.edicao}}</td>
+            <td>{{carta.raridade}}</td>
+            <td>{{carta.quantity}}</td>
+          </tr>
+			{% endfor %}
+			<td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tbody>
+      </table>
+	  
+	  <h3><b>Total a pagar: {{total_price}} {{moeda|safe}} igual a {{total_price_conversion|safe}}</b></h3>
+	  <br></br>
+	  
+	  
+	{% endif %}	 
+{% endif %}	  
+	
+
+	{% if portugal %}
+<div class="control-group">
+            <label class="control-label"><h3>Que m&eacute;todo de envio deseja?</h3></label>
+            <div class="controls">
+              <label class="radio">
+                <input type="radio" name="optionsRadios" id="option1" value="Azul" checked="">
+                Correio azul: {{ azul }} {{moeda|safe}}
+              </label>
+			  <label class="radio">
+                <input type="radio" name="optionsRadios" id="option2" value="Registado">
+                Correio registado: {{ registado }} {{moeda|safe}}
+              </label>
+            </div>
+        </div>
+{% endif %}	
+
+
+{% if brasil %}
+<div class="control-group">
+            <label class="control-label"><h3>Que m&eacute;todo de envio deseja?</h3></label>
+            <div class="controls">
+              <label class="radio">
+				<input type="radio" name="optionsRadios" id="option1" value="Internacional" checked="">
+					Correio Internacional: {{ internacional }} {{moeda|safe}}
+				</label>
+				<label class="radio">
+                <input type="radio" name="optionsRadios" id="option2" value="Internacional_Rastreio">
+                Correio Internacional com rastreio: {{ internacional_rastreio }} {{moeda|safe}}
+              </label>
+            </div>
+        </div>
+{% endif %}	
+
+
+
+{% if cartas_store %}
+{% if cartas_random %}
+<br></br>
+<div class="control-group">
+	<label class="control-label"><h3> Esta encomenda ser&aacute; referente a: </h3></label>
+		<input type="radio" name="group1" value="All" id="order_all" checked> Todas as cartas<br>
+		<input type="radio" name="group1" value="Random" id="order_random"> Cartas Random <br>
+		<input type="radio" name="group1" value="Store"id="order_store"> Cartas Store <br>
+</div>
+{% endif %}	
+{% endif %}	
+
+	
+		
+<br></br>
+	<h3> As cartas ir&atilde;o ser enviadas para o seguinte endere&ccedil;o: </h3> 
+		  
+	<address>
+       <strong> Sr(a). {{nome}}</strong><br>
+       {{morada}}<br>
+	   <b>Pa&iacute;s: </b>{{pais}}<br>
+       <abbr title="Phone"><b>Telefone: </b></abbr> {{telefone}}
+      </address>
+
+	  
+	  
+	  <a class="btn btn-success pull-right" onclick="finish_checkout()"><i class="icon-ok icon-white"></i> Finalizar Encomenda </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "main_base.html" %}
+
+
+{% block javascript %}
+
+
+
+{% endblock %}	
+
+
+
+
+{% block body %}
+
+<center>
+<h3> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Aqui est&atilde;o apenas algumas das cartas que temos em Stock que te podem calhar. </h3>
+<h3> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BE LUCKY!!! </h3>
+</center>
+
+<p></p>
+
+<!-- divisor -->
+<div class="span1">
+
+<div>
+	<img src="img/mtg_card_back.jpg" alt="Common_back" style="visibility:hidden;"/>
+</div>
+</div>
+
+{% for single_rare1 in rare1 %}
+
+
+<div class="span2">
+
+
+<div>
+	<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{single_rare1.name_card}}&amp;size=small&amp;options=" alt="Common_back">
+</div>
+
+</div>
+
+{% endfor %}
+
+
+
+<!-- divisor -->
+<div class="span1">
+
+<div>
+	<img src="img/mtg_card_back.jpg" alt="Common_back" style="visibility:hidden;"/>
+</div>
+</div>
+
+
+{% for single_rare2 in rare2 %}
+
+
+<div class="span2">
+
+<div>
+	<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{single_rare2.name_card}}&amp;size=small&amp;options=" alt="Common_back">
+</div>
+
+</div>
+
+{% endfor %}
+
+
+<!-- divisor -->
+<div class="span1">
+
+<div>
+	<img src="img/mtg_card_back.jpg" alt="Common_back" style="visibility:hidden;"/>
+</div>
+</div>
+
+
+{% for single_uncommon in uncommon %}
+
+<div class="span2">
+
+<div>
+	<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{single_uncommon.name_card}}&amp;size=small&amp;options=" alt="Common_back">
+</div>
+
+</div>
+
+{% endfor %}
+
+
+<!-- divisor -->
+<div class="span1">
+
+<div>
+	<img src="img/mtg_card_back.jpg" alt="Common_back" style="visibility:hidden;"/>
+</div>
+</div>
+
+
+{% for single_common in common %}
+
+<div class="span2">
+
+<div>
+	<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{single_common.name_card}}&amp;size=small&amp;options=" alt="Common_back">
+</div>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}	

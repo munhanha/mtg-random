@@ -1,0 +1,175 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+
+
+//validades if numeric
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+	function disable_all_buttons() {
+		$('#change').attr("disabled", true);
+	}
+	
+	function enable_all_buttons() {
+		$('#change').attr("disabled", false);
+	}
+	
+	function success(message) {
+	
+		$('#erros').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Sucesso: </strong>'+ message +'</div>');
+     
+	}
+	
+	function error(message) {
+	
+		$('#erros').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Erro: </strong>'+ message +'</div>');
+     
+	}
+	
+	
+//Validates Form and sends to server if all is ok
+function ValidateFormAndSend(){
+
+	$('#wrong_morada').html("");
+	$('#wrong_telefone').html("");
+	$('#wrong_codigopostal').html("");
+	$('#erros').html("");
+	
+	var morada = document.getElementById("morada").value;
+	var telefone = document.getElementById("telefone").value;
+	var codigopostal = document.getElementById("codigopostal").value;
+	var codigopostal2 = document.getElementById("codigopostal2").value;
+	//var pais = document.getElementById("pais").value;
+	
+	
+	if (morada == ""){
+		error("Morada obrigat&oacute;ria");
+		return;
+	}
+	
+	if (telefone == ""){
+		//$('#wrong_telefone').html("Campo obrigat&oacute;rio.");
+		error("Telefone obrigat&oacute;rio");
+		return;
+	}
+	
+	if (codigopostal == "" || codigopostal2 == ""){
+		error("C&oacute;digo postal obrigat&oacute;rio");
+		//$('#wrong_codigopostal').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if(telefone.length < 9){
+		error("Telefone demasiado curto, m&iacute;nimo 9 digitos");
+		//$('#wrong_telefone').html("Telefone demasiado curto, m&iacute;nimo 9 digitos");
+		return;
+	}
+	
+	
+	if (!isNumber(telefone)) {
+		error("Campo s&oacute; aceita num&eacute;ricos.");
+		//$('#wrong_telefone').html("Campo s&oacute; aceita num&eacute;ricos.");
+		return;
+	}
+	
+	if (!isNumber(codigopostal) || !isNumber(codigopostal2)){
+		error("Campo s&oacute; aceita num&eacute;ricos.");
+		//$('#wrong_codigopostal').html("Campo s&oacute; aceita num&eacute;ricos.");
+		return;
+	}
+	disable_all_buttons();
+	$.post("/main_page_change_info",
+	{ morada: morada , codigopostal: codigopostal , codigopostal2: codigopostal2 , telefone: telefone},
+	function(data) {
+		enable_all_buttons();
+	
+		//Sucesso
+		if (data == "Success"){			
+			success('Informa&ccedil;&atilde;o alterada com sucesso');
+			return;
+		}
+		
+		//Erro
+		error(data);
+		
+		});
+}
+
+
+
+{% endblock %}
+
+
+{% block alterar_informacao_active %}
+
+	<li class="active"><a href="change_info">Alterar informa&ccedil;&atilde;o pessoal</a></li>
+
+{% endblock %}
+
+
+
+{% block main_page_body %}
+
+
+<div class="span8">
+	
+	<h3> Aqui pode alterar a sua informa&ccedil;&atilde;o pessoal </h3>
+
+	<p></p>
+	
+	<h5> Sr(a) {{nome}} </h5>
+
+	<p></p>
+	
+	<table class="table">
+        
+        <tbody>
+		  
+		  <tr>
+            <td>Morada: </td>
+            <td><input class="input-xlarge search-query" id="morada" type="text" maxlength="80" value="{{morada}}"></td>
+            <!--td><span id="wrong_morada" class="label label-important"></span></td-->  
+          </tr>
+		  
+		  <tr>
+            <td>C&oacute;digo Postal: </td>
+            <td><input class="input-mini search-query" id="codigopostal" type="text" maxlength="6" value="{{cod_post}}"> - 
+			<input class="input-mega-mini search-query" id="codigopostal2" type="text" maxlength="4" value="{{cod_post2}}"></td>
+            <!--td><span id="wrong_codigopostal" class="label label-important"></span></td-->  
+          </tr>
+		  
+		  <tr>
+            <td>Telefone: </td>
+            <td><input class="input-medium search-query" id="telefone" type="text" maxlength="80" value="{{telefone}}"></td>
+            <!--td><span id="wrong_telefone" class="label label-important"></span></td-->  
+          </tr>
+		  
+		  <!--tr>
+            <td>Pa&iacute;s: </td>
+            <td> <select id="pais" class="span2">
+					<option>Portugal</option>
+					<option>Brasil</option>
+				</select></td>
+          </tr-->
+		  <tr>
+			<td><button onclick="ValidateFormAndSend()" id="change" class="btn btn-primary">Submeter</button></td>  
+			<td><div id="erros"></div></td>  
+		  </tr>
+		  
+        </tbody>
+      </table>
+
+	</div>
+	
+	
+
+
+
+{% endblock %}
+
+
+

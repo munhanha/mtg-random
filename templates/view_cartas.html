@@ -1,0 +1,258 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+function disable_all_buttons() {
+	$(":input").attr("disabled","true");
+	$("#checkout").attr("disabled","true");
+	$("#sell_all").attr("disabled","true");
+}
+
+function enable_all_buttons() {
+	$(':input').attr("disabled", false);
+	$('#checkout').attr("disabled", false);
+	$('#sell_all').attr("disabled", false);
+	
+}
+
+
+function change_saldo_user(saldo) {
+	$('#saldo_utilizador').html('Saldo actual: <a href="payment">'+saldo+' </a>{{moeda|safe}} &#160;&#160;&#160;&#160;&#160;');
+}
+
+
+function sell_card(obj) {
+
+			disable_all_buttons();
+			
+			var nome = obj.getAttribute("nome");
+			var edicao = obj.getAttribute("edicao");
+			var raridade = obj.getAttribute("raridade");
+			var position = obj.getAttribute("todelete");
+			
+			var r=confirm("Por favor confirme a venda da carta " + nome +". O valor da venda equivale a metado do da de compra.");
+			if (r==true) {
+				
+				$.post("/sell_card", 
+					{ nome: nome , edicao: edicao, raridade: raridade},
+						function(data) {
+						
+						enable_all_buttons();
+				
+						var info = data.split("###");
+					
+						if (info[0] == "Erro")
+							alert(info[1]);
+					
+						else {
+							$('#'+position).html("");
+							change_saldo_user(info[1]);					
+						}
+			});
+			}
+	}
+
+function sell_all_card(obj) {
+
+			disable_all_buttons();
+			
+			var r=confirm("Quer mesmo vender todas as cartas? O valor da venda equivale a metade do valor da compra.");
+			if (r==true) {
+				
+				$.post("/sell_all",{},
+						function(data) {
+						
+						//enable_all_buttons();	
+						window.location.reload();
+			});
+			}
+			else{
+				enable_all_buttons();
+			}
+	}
+
+	
+function change_quantity(obj) {
+
+			disable_all_buttons();
+			
+			var nome = obj.getAttribute("nome");
+			var edicao = obj.getAttribute("edicao");
+			var raridade = obj.getAttribute("raridade");
+			var position = obj.getAttribute("tochange");
+			
+			var quantity = document.getElementById("cardstore"+position).value;
+				
+			$.post("/change_quantity_card", 
+				{ nome: nome , edicao: edicao, raridade: raridade,quantity: quantity},
+					function(data) {
+					
+					if(data == "success")
+						window.location.reload();
+					else{
+						alert(data);
+						window.location.reload();
+					}
+					
+					enable_all_buttons();
+				
+			});
+	}	
+	
+	
+function empty_cart(obj) {
+
+			disable_all_buttons();
+			
+			var r=confirm("Quer mesmo esvaziar o seu carrinho?");
+			if (r==true) {
+				
+				$.post("/clean_user_cart",{},
+						function(data) {
+						
+						//enable_all_buttons();
+						window.location.reload();
+			});
+			}
+			else{
+				enable_all_buttons();
+			}
+	}	
+	
+{% endblock %}
+
+
+
+
+{% block view_cards_active %}
+
+	<li class="active"><a href="view_cards">Finalizar Encomenda</a></li>
+
+{% endblock %}
+
+
+{% block under_menu %}	
+	
+	
+{% endblock %}
+
+
+{% block main_page_body %}
+
+
+
+<div class="span8" id="input_user">
+
+	{% if no_cards %}
+		<h2> N&atilde;o tem cartas no seu carrinho </h2>
+		
+	{% else %}
+	
+	<ul id="myTab" class="nav nav-tabs">
+				{% if cartas_random %}
+					<li class="active"><a href="#random" data-toggle="tab">Cartas Random</a></li>
+				{% endif %}	
+				{% if cartas_store %}
+				
+					{% if cartas_random %}
+						<li class=""><a href="#store" data-toggle="tab">Cartas Store</a></li>
+					{% else %}
+						<li class="active"><a href="#store" data-toggle="tab">Cartas Store</a></li>
+					{% endif %}
+				{% endif %}
+            </ul>
+			
+	<div id="myTabContent" class="tab-content">
+	
+		{% if cartas_random %}
+              <div class="tab-pane fade active in" id="random">
+			  
+				<table class="table table" border="0" id="cards_table">
+					<thead>
+					<tr>
+					<th>Nome</th>
+					<th>Edi&ccedil;&atilde;o</th>
+					<th>Raridade</th>
+					<th></th>
+					</tr>
+					</thead>
+				<tbody>
+					{% for carta in cartas_random %}
+					<tr id="{{forloop.counter}}">
+					<td><a href="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{carta.nome}} &amp;size=small&amp;options=" target="_blank">{{carta.nome}}</a></td>
+					<td>{{carta.edicao}}</td>
+					<td>{{carta.raridade}}</td>
+					<td><button class="btn btn-primary" todelete="{{forloop.counter}}" nome="{{carta.nome}}" edicao="{{carta.edicao}}" raridade="{{carta.raridade}}" onclick="sell_card(this)">Vender Carta</button></td>
+					</tr>
+					{% endfor %}
+					<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td><a class="btn btn-danger" id="sell_all" onclick="sell_all_card()"><i class="icon-remove icon-white"></i> Vender Tudo</a></td>
+					</tr>
+				</tbody>
+				</table>
+	
+              </div>
+		{% endif %}
+
+			{% if cartas_store %}
+				{% if cartas_random %}
+					<div class="tab-pane fade" id="store">
+				{% else %}
+					<div class="tab-pane fade active in" id="store">
+				{% endif %}
+				
+				
+				<table class="table table" border="0" id="cards_table">
+			
+					<thead>
+					<tr>
+					<th>Nome</th>
+					<th>Edi&ccedil;&atilde;o</th>
+					<th>Raridade</th>
+					<th>Stock Disponivel</th>
+					<th>Pre&ccedil;o(Unidade)</th>
+					<th>QTD</th>
+					<th></th>
+					</tr>
+					</thead>
+				<tbody>
+					{% for carta in cartas_store %}
+					<tr id="{{forloop.counter}}">
+					<td><a href="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name={{carta.nome}} &amp;size=small&amp;options=" target="_blank">{{carta.nome}}</a></td>
+					<td>{{carta.edicao}}</td>
+					<td>{{carta.raridade}}</td>
+					<td>{{carta.stock}}</td>
+					<td>{{carta.real_value}} {{moeda|safe}} <p></p> igual a <p></p> {{carta.conversion|safe}}</td>
+					<td><input class="input-mega-mini search-query" id="cardstore{{forloop.counter}}" type="text" value="{{carta.quantity}}" maxlength="1" id="{{forloop.counter}}"></td></td>
+					<td><td><button class="btn btn-primary" quantity="{{carta.quantity}}" tochange="{{forloop.counter}}" nome="{{carta.nome}}" edicao="{{carta.edicao}}" raridade="{{carta.raridade}}" onclick="change_quantity(this)">Alterar</button></td></td>
+					</tr>
+					{% endfor %}
+					<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td> Total: {{total_price}} {{moeda|safe}} igual a {{total_price_conversion|safe}} </td>
+					<td></td>
+					<td><a class="btn btn-danger" id="empty cart" onclick="empty_cart()"> Esvaziar <i class="icon-shopping-cart icon-white"> </a></td>
+					</tr>
+				</tbody>
+				</table>
+						
+              </div>
+		{% endif %}
+	
+			  
+            </div>		
+	  
+	<a class="btn btn-success pull-right" href="checkout" id="checkout"><i class="icon-shopping-cart icon-white"></i> Checkout &raquo;</a>
+	  
+{% endif %}	  
+	</div>
+
+{% endblock %}

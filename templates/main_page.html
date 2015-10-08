@@ -1,0 +1,420 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+function add_compra(card) {
+	$('#info').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Compra:</strong> Adicionou a carta '+ card + ' ao seu carrinho</div>');
+}
+
+function add_venda(card) {
+	$('#info').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Venda:</strong> Vendeu a carta ' + card + '</div>');
+}
+
+function change_saldo_user(saldo) {
+	$('#saldo_utilizador').html('Saldo actual: <a href="payment">'+saldo+' </a>{{moeda|safe}} &#160;&#160;&#160;&#160;&#160;');
+}
+
+function change_common_card(card){
+	$('#common_card').html('<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name=' + card + '&amp;size=small&amp;options=" alt="Common_back">');
+}
+function revert_common_card(){
+	$('#common_card').html('<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>');
+	$('#info_common_card').html('');
+	$('#common_interface').html('<button onclick="get_card(this)" id="get_common" rarity="Common" class="btn btn-success">Comprar</button>');
+	$('#common_interface').append('<img id="isLoading_common" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+}
+function change_uncommon_card(card){
+	$('#uncommon_card').html('<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name=' + card + '&amp;size=small&amp;options=" alt="Common_back">');
+}
+function revert_uncommon_card(){
+	$('#uncommon_card').html('<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>');
+	$('#info_uncommon_card').html('');
+	$('#uncommon_interface').html('<button onclick="get_card(this)" id="get_uncommon" rarity="Uncommon" class="btn btn-success">Comprar</button>');
+	$('#uncommon_interface').append('<img id="isLoading_uncommon" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+}
+function change_rare_card(card){
+	$('#rare_card').html('<img id="big_card" src="http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name=' + card + '&amp;size=small&amp;options=" alt="Common_back">');
+}
+function revert_rare_card(){
+	$('#rare_card').html('<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>');
+	$('#info_rare_card').html('');
+	$('#rare_interface').html('<button onclick="get_card(this)" id="get_rare" rarity="Rare" class="btn btn-success">Comprar</button>');
+	$('#rare_interface').append('<img id="isLoading_rare" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+}
+
+function change_and_info_card_by_rarity(nome,cor,custo,tipo,poder_resistencia,texto,raridade,edicao){
+
+	if(raridade == "Common"){
+		change_common_card(nome);
+		$('#info_common_card').html('<h4>Nome: </h4>' + nome);
+		//$('#info_common_card').append('<h4>Cor: </h4>' + cor);
+		//$('#info_common_card').append('<h4>Custo: </h4>' + custo);
+		//$('#info_common_card').append('<h4>Tipo: </h4>' + tipo);
+		//$('#info_common_card').append('<h4>Poder/Resistencia: </h4>' + poder_resistencia);
+		//$('#info_common_card').append('<h4>Texto: </h4>' + texto);
+		$('#info_common_card').append('<h4>Raridade: </h4>' + raridade);
+		$('#info_common_card').append('<h4>Edicao: </h4>' + edicao);
+	
+		
+	}
+	if(raridade == "Uncommon"){
+		change_uncommon_card(nome);
+		$('#info_uncommon_card').html('<h4>Nome: </h4>' + nome);
+		//$('#info_uncommon_card').append('<h4>Cor: </h4>' + cor);
+		//$('#info_uncommon_card').append('<h4>Custo: </h4>' + custo);
+		//$('#info_uncommon_card').append('<h4>Tipo: </h4>' + tipo);
+		//$('#info_uncommon_card').append('<h4>Poder/Resistencia: </h4>' + poder_resistencia);
+		//$('#info_uncommon_card').append('<h4>Texto: </h4>' + texto);
+		$('#info_uncommon_card').append('<h4>Raridade: </h4>' + raridade);
+		$('#info_uncommon_card').append('<h4>Edicao: </h4>' + edicao);
+	}
+	if(raridade == "Rare" || raridade == "Mytic"){
+		change_rare_card(nome);
+		$('#info_rare_card').html('<h4>Nome: </h4>' + nome);
+		//$('#info_rare_card').append('<h4>Cor: </h4>' + cor);
+		//$('#info_rare_card').append('<h4>Custo: </h4>' + custo);
+		//$('#info_rare_card').append('<h4>Tipo: </h4>' + tipo);
+		//$('#info_rare_card').append('<h4>Poder/Resistencia: </h4>' + poder_resistencia);
+		//$('#info_rare_card').append('<h4>Texto: </h4>' + texto);
+		$('#info_rare_card').append('<h4>Raridade: </h4>' + raridade);
+		$('#info_rare_card').append('<h4>Edicao: </h4>' + edicao);
+	}
+
+
+}
+
+function revert_by_rarity(rarity) {
+
+
+	if(rarity == "Common"){
+		revert_uncommon_card()
+		revert_rare_card()
+	}
+	if(rarity == "Uncommon"){
+		revert_common_card()
+		revert_rare_card()
+	}
+	if(rarity == "Rare"){
+		revert_common_card()
+		revert_uncommon_card()
+	}
+}
+
+function revert_rarity(rarity) {
+
+	if(rarity == "Common"){
+		revert_common_card();
+	}
+	if(rarity == "Uncommon"){
+		revert_uncommon_card();
+	}
+	if(rarity == "Rare" || rarity == "Mytic"){
+		revert_rare_card();
+	}
+
+}
+
+function enable_loading_by_rarity(rarity) {
+	
+	if(rarity == "Common"){
+		document.getElementById('isLoading_common').style.display = '';
+	}	
+	if(rarity == "Uncommon"){
+		document.getElementById('isLoading_uncommon').style.display = '';
+	}	
+	if(rarity == "Rare"){
+		document.getElementById('isLoading_rare').style.display = '';
+	}	
+
+}
+
+function disable_loading_by_rarity(rarity) {
+
+	if(rarity == "Common")
+		document.getElementById('isLoading_common').style.display = 'none';
+	if(rarity == "Uncommon")
+		document.getElementById('isLoading_uncommon').style.display = 'none';
+	if(rarity == "Rare")
+		document.getElementById('isLoading_rare').style.display = 'none';
+}
+
+function disable_all_buttons() {
+	$('#get_common').attr("disabled", true);
+	$('#get_uncommon').attr("disabled", true);
+	$('#get_rare').attr("disabled", true);
+	
+	$('#sell_common').attr("disabled", true);
+	$('#sell_uncommon').attr("disabled", true);
+	$('#sell_rare').attr("disabled", true);
+	
+	
+}
+
+function enable_all_buttons() {
+	$('#get_common').attr("disabled", false);
+	$('#get_uncommon').attr("disabled", false);
+	$('#get_rare').attr("disabled", false);
+	
+	$('#sell_common').attr("disabled", false);
+	$('#sell_uncommon').attr("disabled", false);
+	$('#sell_rare').attr("disabled", false);
+	
+}
+
+
+//gets random card
+function get_card(obj) {
+
+var rarity = obj.getAttribute("rarity");
+
+
+revert_by_rarity(rarity)
+enable_loading_by_rarity(rarity);
+disable_all_buttons();
+
+
+$.post("/get_random_card", 
+		{ rarity: rarity},
+			function(data) {
+				
+							
+				var info = data.split("###");
+				
+				if (info[0] == "Erro"){
+					alert(info[1]);
+					disable_loading_by_rarity(rarity);
+					}
+				else{
+					var nome = info[1];
+					var cor = info[2];
+					var custo = info[3];
+					var tipo = info[4];
+					var poder_resistencia = info[5];
+					var texto = info[6];
+					var raridade = info[7];
+					var edicao = info[8];
+					
+					var saldo = info[9]
+				
+					change_and_info_card_by_rarity(nome,cor,custo,tipo,poder_resistencia,texto,raridade,edicao);
+					
+					change_saldo_user(saldo);
+					disable_loading_by_rarity(rarity);
+					
+					add_interface_by_rarity(nome,edicao,raridade);
+					add_compra(nome);
+					
+					
+					if(info[0] == "WINNER")
+						$('#winnerModal').modal('show')
+					
+					}
+			enable_all_buttons();
+		});
+		
+}
+
+function sell_card(obj) {
+		
+			var nome = obj.getAttribute("nome");
+			var edicao = obj.getAttribute("edicao");
+			var raridade = obj.getAttribute("rarity");
+			
+			
+			var r=confirm("Por favor confirme a venda da carta " + nome +". O valor da venda equivale a metade do valor da compra.");
+			if (r==true) {
+				disable_all_buttons();
+				
+				$.post("/sell_card", 
+					{ nome: nome , edicao: edicao, raridade: raridade},
+						function(data) {
+			
+						var info = data.split("###");
+						
+						enable_all_buttons();
+				
+					if (info[0] == "Erro")
+						alert(info[1]);
+					
+					else {
+						change_saldo_user(info[1]);
+						revert_rarity(raridade);
+						add_venda(nome);
+						}
+			});
+			}
+	}
+
+function add_interface_by_rarity(nome,edicao,rarity){
+
+	if(rarity == "Common"){
+		$('#common_interface').html('<center><button onclick="get_card(this)" id="get_common" rarity="Common" class="btn btn-success">Comprar Outra</button>');
+		$('#common_interface').append(" ");
+		$('#common_interface').append('<button onclick="sell_card(this)" id="sell_common" nome="'+nome+'" edicao="'+edicao+'" rarity="Common" class="btn btn-danger">Vender de volta</button></center>');
+		$('#common_interface').append(" ");
+		$('#common_interface').append('<img id="isLoading_common" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+	}	
+	
+	if(rarity == "Uncommon"){
+		$('#uncommon_interface').html('<center><button onclick="get_card(this)" id="get_uncommon" rarity="Uncommon" class="btn btn-success">Comprar Outra</button>');
+		$('#uncommon_interface').append(" ");
+		$('#uncommon_interface').append('<button onclick="sell_card(this)" id="sell_uncommon" nome="'+nome+'" edicao="'+edicao+'" rarity="Uncommon" class="btn btn-danger">Vender de volta</button></center>');
+		$('#uncommon_interface').append(" ");
+		$('#uncommon_interface').append('<img id="isLoading_uncommon" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+	}	
+	
+	if(rarity == "Rare" || rarity == "Mytic" ){
+		$('#rare_interface').html('<center><button onclick="get_card(this)" id="get_rare" rarity="Rare" class="btn btn-success">Comprar Outra</button>');
+		$('#rare_interface').append(" ");
+		$('#rare_interface').append('<button onclick="sell_card(this)" id="sell_rare" nome="'+nome+'" edicao="'+edicao+'" rarity="'+rarity+'" class="btn btn-danger">Vender de volta</button></center>');
+		$('#rare_interface').append(" ");
+		$('#rare_interface').append('<img id="isLoading_rare" src="img/loading.gif" style="display:none" alt="Smiley face"/>');
+	}	
+
+}
+
+
+
+{% endblock %}
+
+
+
+
+{% block comprar_cartas_active %}
+
+	<li class="active"><a href="main_page">Comprar Cartas (Random)</a></li>
+
+{% endblock %}
+
+
+{% block under_menu %}
+
+
+<p></p>
+
+<center><a class="btn btn-large btn-info " href="view_cards"><i class="icon-shopping-cart icon-white"></i> Carrinho</a>	</center>
+
+<p></p>
+
+<center><a class="btn btn-large btn-success " href="payment"><i class="icon-user icon-white"></i> Carregar Conta</a>	</center>
+
+<p></p>
+
+	{% if portugal %}
+		<div class="alert alert-info">
+			<strong>Portes de envio:</strong>
+			<p></p>
+			<strong>Correio Azul:</strong> {{azul}} {{moeda|safe}}</a>
+			<p></p>
+			<strong>Correio Registado:</strong> {{registado}} {{moeda|safe}}</a>
+		</div>
+	
+	
+	{% else %}
+		<div class="alert alert-info">
+			<strong>Portes de envio:</strong>
+				<p></p>
+			<strong> Correio Internacional:</strong> {{internacional}} {{moeda|safe}}</a>
+				<p></p>
+			<strong> Correio Internacional com Rastreio:</strong> {{internacional_rastreio}} {{moeda|safe}}</a>	
+		</div>
+	{% endif %}	 
+
+
+<!--p></p>
+<center><h3 id="saldo_utilizador">O seu saldo &eacute; {{saldo}} {{moeda|safe}}</h3></center-->
+
+
+
+
+{% endblock %}
+
+
+{% block main_page_body %}
+
+
+<div class="modal hide" id="winnerModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"></button>
+    <h3>VENCEDOR!!!</h3>
+  </div>
+  <div class="modal-body">
+    <p>Por ser t&atilde;o bom cliente, acabou de ganhar 25 cr&eacute;ditos!!!</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Fechar</a>
+  </div>
+</div>
+
+
+
+<div class="span3">
+
+<center><h3> Comum {{preco_comum}} {{moeda|safe}} </h3>
+<center><h5> {{valor_do_site|safe}}</h5>
+
+
+<div id="common_card">
+	<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>
+</div>
+
+
+<div id="common_interface">
+<button onclick="get_card(this)" id="get_common" rarity="Common" class="btn btn-success">Comprar</button>
+<img id="isLoading_common" src="img/loading.gif" style="display:none" alt="Smiley face"/>
+</div>
+
+</center>
+
+<div id="info_common_card"></div>
+
+
+</div>
+
+<div class="span3">
+
+<center><h3> Incomum {{preco_incomum}} {{moeda|safe}} </h3>
+<center><h5> {{valor_do_site|safe}}</h5>
+
+
+<div id="uncommon_card">
+	<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>
+</div>
+
+<div id="uncommon_interface">
+<button onclick="get_card(this)" id="get_uncommon" rarity="Uncommon" class="btn btn-success">Comprar</button>
+<img id="isLoading_uncommon" src="img/loading.gif" style="display:none" alt="Smiley face"/>
+</div>
+
+</center>
+
+<div id="info_uncommon_card"></div>
+
+</div>
+
+<div class="span3">
+
+<center><h3>   Rara/M&iacute;tica {{preco_rara}} {{moeda|safe}} </h3>
+<center><h5> {{valor_do_site|safe}}</h5>
+
+
+<div id="rare_card">
+	<img src="img/mtg_card_back.jpg" alt="Common_back" height="225" width="225"/>
+</div>
+
+<div id="rare_interface">
+<button onclick="get_card(this)" id="get_rare" rarity="Rare" class="btn btn-success">Comprar</button>
+<img id="isLoading_rare" src="img/loading.gif" style="display:none" alt="Smiley face"/>
+</div>
+
+
+</center>
+
+<div id="info_rare_card"></div>
+
+</div>
+
+
+
+{% endblock %}

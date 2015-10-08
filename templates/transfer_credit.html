@@ -1,0 +1,145 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+	//Validates an email	
+	function validate_email(email) {
+ 
+		var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+		if(reg.test(email) == false) {
+		return false;
+		}
+		return true;
+	}	
+
+	//validades if numeric
+	function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}	
+
+
+	function success(message) {
+	
+		$('#erros').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Sucesso: </strong>'+ message +'</div>');
+     
+	}
+	
+	function error(message) {
+	
+		$('#erros').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Erro: </strong>'+ message +'</div>');
+     
+	}
+	
+	function change_saldo_user(saldo) {
+		$('#saldo_utilizador').html('Saldo actual: <a href="payment">'+saldo+' </a>{{moeda|safe}} &#160;&#160;&#160;&#160;&#160;');
+	}
+	
+	function disable_all_buttons() {
+		$('#transferir').attr("disabled", true);
+	}
+	
+	function enable_all_buttons() {
+		$('#transferir').attr("disabled", false);
+	}
+
+	function ValidateInfoAndSend(){
+
+		$('#erros').html("");
+		
+		var email = document.getElementById("another_user").value;	
+		var valor = document.getElementById("creditos").value;
+		
+		if (email == ""){
+			error("Campo de email n&atilde;o pode estar vazio");
+			return;
+			}
+	
+		if (valor == ""){
+			error("Campo de valor n&atilde;o pode estar vazio");
+			return;
+			}
+		
+		if (!validate_email(email)){
+			error("Email inv&aacute;lido");
+			return;
+		}
+		
+		if (!isNumber(valor)) {
+			error("O campo valor s&oacute; pode conter valores num&eacute;ricos");
+			return;
+		}
+		
+		if (valor == 0) {
+			error("Quer mesmo transferir 0 cr&eacute;ditos?");
+			return;
+		}
+		
+		disable_all_buttons();
+		$.post("/transfer_credit_between_users",
+			{ email: email , valor: valor},
+		function(data) {
+			enable_all_buttons();
+		
+			var info = data.split("###");
+			
+			if( info[0] == "Error")
+				error(info[1]);
+			else{
+				success(info[1]);
+				
+				change_saldo_user(info[3]);
+				}
+				
+			
+		
+		});
+	
+
+		
+	
+	}
+
+
+
+
+{% endblock %}	
+
+
+{% block transferir_saldo %}
+
+	<li class="active"><a href="transfer_credit">Transferir saldo entre utilizadores</a></li>
+
+{% endblock %}
+
+
+{% block under_menu %}
+
+	<!--center><h3 id="saldo_utilizador">O seu saldo &eacute; {{saldo}} {{moeda|safe}}</h3></center-->
+
+{% endblock %}
+
+
+
+{% block main_page_body %}
+<div class="span6">
+
+	<h3>Aqui pode transferir cr&eacute;ditos do seu saldo para outro utilizador.</h3>
+	<p></p>
+	<h4>Este servi&ccedil;o tem um custo de {{transfer_cost}} cr&eacute;ditos.</h4>
+
+	<p></p>
+	
+	Transferir <input class="input-mega-mini search-query" id="creditos" type="text" maxlength="80" value="0"> cr&eacute;ditos para <input class="input-xlarge search-query" id="another_user" type="text" maxlength="80" value="E-mail">
+		
+	<br></br>
+	<button onclick="ValidateInfoAndSend()" id="transferir" class="btn btn-primary">Transferir</button>	
+	<br></br>
+	<div id="erros">
+	
+	</div>
+		
+</div>
+{% endblock %}	
+
+	

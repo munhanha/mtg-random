@@ -1,0 +1,118 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+
+{% endblock %}
+
+{% block carregamento_active %}
+
+	<li class="active"><a href="payment">Carregamento</a></li>
+
+{% endblock %}
+
+{% block under_menu %}
+
+
+
+{% endblock %}
+
+{% block main_page_body %}
+
+<div class="span8">
+	
+	<h2> Por favor utilize os dados abaixo para completar o seu processo de pagamento </h2>
+	
+	<p></p>
+
+	<br></br>
+
+
+	{% if portugal %}
+	
+	
+	{% if transferencia %}
+	
+	<h3>- Transfer&ecirc;ncia Banc&aacute;ria </h3>
+		<p></p>
+		Os dados da Transfer&ecirc;ncia Banc&aacute;ria s&atilde;o: <b> 0007 0143 00322150000 09 </b>
+		<p></p>
+		Acelere o seu carregamento tornando-o quase instant&acirc;neo enviando o comprovativo para <a href="mailto:payments@mtgrchance.com">payments@mtgchance.com</a></p>
+		
+		
+	{% endif %}
+	
+	{% if paypal %}
+	
+	<h3>- PAYPAL/ Cart&atilde;o de Credito</h3>
+		
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<input type="hidden" name="cmd" value="_s-xclick">
+		<input type="hidden" name="hosted_button_id" value="H55JWM84R2GJA">
+		<table>
+			<tr><td><input type="hidden" name="on0" value="Carregar Creditos">Carregar Creditos</td></tr><tr><td><select name="os0">
+			<option value="500">500 Cr&eacute;ditos 5,00 EUR</option>
+			<option value="1000">1000 Cr&eacute;ditos 10,00 EUR</option>
+			<option value="1500">1500 Cr&eacute;ditos 15,00 EUR</option>
+			<option value="2500">2500 Cr&eacute;ditos 25,00 EUR</option>
+			<option value="5000">5000 Cr&eacute;ditos 50,00 EUR</option>
+			</select> </td></tr>
+		</table>
+		<input type="hidden" name="currency_code" value="EUR">
+		<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+		<img alt="" border="0" src="https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif" width="1" height="1">
+		</form>
+
+	{% endif %}		
+	
+	{% if pagamento %}
+	
+	<h3>- Pagamento de servi&ccedil;os: </h3> 
+	<p></p>
+	ENTIDADE : <b>20130</b>
+	REFERENCIA : <b>359937125</b>
+		
+	<p></p>
+		
+	Acelere o seu carregamento tornando-o quase instant&acirc;neo enviando o comprovativo para <a href="mailto:payments@mtgrchance.com">payments@mtgchance.com</a></p>
+	
+	{% endif %}
+	
+	{% endif %}
+	
+
+
+	
+	{% if brasil %}	
+	
+	{% if paypal %}
+	
+	<h3>- PAYPAL</h3>
+		
+		
+		<form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<input type="hidden" name="cmd" value="_s-xclick">
+		<input type="hidden" name="hosted_button_id" value="JXD5FRP6GHS3S">
+		<table>
+			<tr><td><input type="hidden" name="on0" value="Carregar Creditos">Carregar Creditos</td></tr><tr><td><select name="os0">
+			<option value="500">500 Cr&eacute;ditos 15,00 R$</option>
+			<option value="1000">1000 Cr&eacute;ditos 30,00 R$</option>
+			<option value="1500">1500 Cr&eacute;ditos 45,00 R$</option>
+			<option value="2500">2500 Cr&eacute;ditos 75,00 R$</option>
+			<option value="5000">5000 Cr&eacute;ditos 150,00 R$</option>
+			</select> </td></tr>
+		</table>
+		<input type="hidden" name="currency_code" value="BRL">
+		<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+		<img alt="" border="0" src="https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif" width="1" height="1">
+		</form>
+	
+	{% endif %}
+	
+	{% endif %}	
+</div>
+
+
+
+{% endblock %}

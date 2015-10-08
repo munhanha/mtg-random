@@ -1,0 +1,141 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+//validades if numeric
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function disable_all_buttons() {
+	$('#request').attr("disabled", true);
+}	
+function enable_all_buttons() {
+	$('#request').attr("disabled", false);
+}
+function success(message) {	
+		$('#erros').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Sucesso: </strong>'+ message +'</div>');
+	}
+	
+function error(message) {	
+	$('#erros').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Erro: </strong>'+ message +'</div>'); 
+	}
+	
+function ValidateFormAndSend(){
+
+	disable_all_buttons();
+
+	var valor = document.getElementById("carregamento").value;
+	var metodo = document.getElementById("metodo").value.toString();
+
+	if (!isNumber(valor)) {
+		error("Valor do carregamento inv&aacute;lido");
+		enable_all_buttons();
+		return;
+	}
+	
+	
+	$.post("/register_payment",
+			{ valor: valor , metodo: metodo},
+		function(data) {
+			enable_all_buttons();
+		
+			var info = data.split("###");
+			
+			if( info[0] == "Error")
+				error(info[1]);
+			else{
+				window.location = "payment_registered";	
+				//success(info[1]);
+				}
+		});
+}	
+
+
+{% endblock %}
+
+{% block carregamento_active %}
+
+	<li class="active"><a href="payment">Carregamento</a></li>
+
+{% endblock %}
+
+{% block under_menu %}
+
+
+
+{% endblock %}
+
+{% block main_page_body %}
+
+<div class="span5">
+	
+	{% if portugal %}
+	
+	
+	<h3> Com que valor pretende carregar a sua conta? </h3>
+	<p></p>
+            <td> <select id="carregamento" class="span2">
+				<option value="5">500 Cr&eacute;ditos 5,00 EUR</option>
+				<option value="10">1000 Cr&eacute;ditos 10,00 EUR</option>
+				<option value="15">1500 Cr&eacute;ditos 15,00 EUR</option>
+				<option value="25">2500 Cr&eacute;ditos 25,00 EUR</option>
+				<option value="50">5000 Cr&eacute;ditos 50,00 EUR</option>
+			</select></td>
+          </tr>
+	
+	<p></p>
+	
+	<h3>Selecione Forma de Pagamento: </h3>
+	<p></p>
+            <td> <select id="metodo" class="span3">
+					<option value="Transferencia">Transfer&ecirc;ncia Banc&aacute;ria</option>
+					<option value="Pagamento">Pagamento de Servi&ccedil;os</option>
+					<option value="PAYPAL">PAYPAL/ Cart&atilde;o de Credito</option>
+				</select></td>
+          </tr>
+	
+	<p></p>
+	
+	<td><button onclick="ValidateFormAndSend()" id="request" class="btn btn-primary pull-right">Submeter</button></td>
+	<br></br>
+	<td><div id="erros"></div></td>  
+		
+		
+	{% endif %}
+		
+	{% if brasil %}	
+	
+	<h3> Com que valor pretende carregar a sua conta? </h3>
+	<p></p>
+            <td> <select id="carregamento" class="span2">
+			<option value="15">500 Cr&eacute;ditos 15,00 R$</option>
+			<option value="30">1000 Cr&eacute;ditos 30,00 R$</option>
+			<option value="45">1500 Cr&eacute;ditos 45,00 R$</option>
+			<option value="75">2500 Cr&eacute;ditos 75,00 R$</option>
+			<option value="150">5000 Cr&eacute;ditos 150,00 R$</option>
+			</select></td>
+          </tr>
+	
+	<p></p>
+	
+	<h3>Selecione Forma de Pagamento: </h3>
+	<p></p>
+            <td> <select id="metodo" class="span3">
+					<option value="PAYPAL">PAYPAL/ Cart&atilde;o de Credito</option>
+				</select></td>
+          </tr>
+	
+	<p></p>
+	
+	<td><button onclick="ValidateFormAndSend()" id="request" class="btn btn-primary pull-right">Submeter</button></td>
+	<br></br>
+	<td><div id="erros"></div></td>  
+		
+	{% endif %}	
+</div>
+
+
+
+{% endblock %}

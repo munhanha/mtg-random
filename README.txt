@@ -1,0 +1,1 @@
+start cmd: python manage.py runserver --smtp_host=localhost --smtp_port=4321

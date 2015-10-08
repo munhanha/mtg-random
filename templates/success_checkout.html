@@ -1,0 +1,129 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+function Show_Option_Portugal(){
+
+	var option = document.getElementById("metodo").value;
+	
+	
+	if(option=="Transferencia")
+		$('#option_display').html(
+		"<h4>- Transfer&ecirc;ncia Banc&aacute;ria<p></p></h4>"+
+		"Os dados da Transfer&ecirc;ncia Banc&aacute;ria s&atilde;o: 0007 0143 00322150000 09<p></p>"+
+		"Acelere o seu carregamento tornando-o quase instant&acirc;neo enviando o comprovativo para payments@mtgchance.com<p></p>"
+		);
+	if(option=="Pagamento")
+		$('#option_display').html(
+			"<h4>- Pagamento de servi&ccedil;os:<p></p></h4>"+
+			"ENTIDADE : 20130 REFERENCIA : 359937125<p></p>"+
+			"Acelere o seu carregamento tornando-o quase instant&acirc;neo enviando o comprovativo para payments@mtgchance.com<p></p>"
+		);
+		
+	if(option=="PAYPAL")
+		$('#option_display').html(
+		"<form action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\">"+
+		"<input type=\"hidden\" name=\"cmd\" value=\"_s-xclick\">"+
+		"<input type=\"hidden\" name=\"hosted_button_id\" value=\"H55JWM84R2GJA\">"+
+		"<table>"+
+			"<tr><td><input type=\"hidden\" name=\"on0\" value=\"Carregar Creditos\">Carregar Creditos</td></tr><tr><td><select name=\"os0\">"+
+			"<option value=\"500\">500 Cr&eacute;ditos 5,00 EUR</option>"+
+			"<option value=\"1000\">1000 Cr&eacute;ditos 10,00 EUR</option>"+
+			"<option value=\"1500\">1500 Cr&eacute;ditos 15,00 EUR</option>"+
+			"<option value=\"2500\">2500 Cr&eacute;ditos 25,00 EUR</option>"+
+			"<option value=\"5000\">5000 Cr&eacute;ditos 50,00 EUR</option>"+
+			"</select> </td></tr>"+
+		"</table>"+
+		"<input type=\"hidden\" name=\"currency_code\" value=\"EUR\">"+
+		"<input type=\"image\" src=\"https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif\" border=\"0\" name=\"submit\" alt=\"PayPal - The safer, easier way to pay online!\">"+
+		"<img alt=\"\" border=\"0\" src=\"https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif\" width=\"1\" height=\"1\">"+
+		"</form>"+
+		"<br></br>"+
+		"<h3><b>Caso pretenda carregar o valor exacto da sua compra entre em contacto connosco para <a href=\"mailto:Payments@mtgchance.com\">payments@mtgchance.com</a><b></h3>"
+		);
+
+}
+
+{% endblock %}
+
+{% block last_order_active %}
+
+	<li class="active"><a href="success_checkout">&Uacute;ltima encomenda</a></li>
+	
+{% endblock %}
+
+
+{% block main_page_body %}
+<div class="span6">
+
+
+	{% if no_orders %}
+		<h2> Ainda n&atilde;o tem hist&oacute;rico. </h2>
+
+		
+	{% else %}
+	<h3> Completou com sucesso a sua encomenda.
+	<p></p>
+	Pode informar-se do estado do seu pedido consultando o seu hist&oacute;rico. O n&uacute;mero da sua encomenda &eacute; #{{order.codigo}}.</h3>
+	<br></br>
+	{% if negative_client %}
+		
+		De modo a efectuar o pagamento de <b> {{negative_client}} cr&eacute;ditos igual a {{negative_client_conversion|safe}} </b> escolha como deseja efectuar o pagamento:
+		<p></p>
+		
+			{% if portugal %}
+			    <h3>Selecione Forma de Pagamento: </h3>
+					<p></p>
+				<td> <select id="metodo" class="span3">
+					<option value="Transferencia">Transfer&ecirc;ncia Banc&aacute;ria</option>
+					<option value="Pagamento">Pagamento de Servi&ccedil;os</option>
+					<option value="PAYPAL">PAYPAL/ Cart&atilde;o de Credito</option>
+				</select></td>
+				
+				<button onclick="Show_Option_Portugal()" id="request" class="btn btn-primary pull-right">Submeter</button>
+			
+			{% endif %}
+			
+			{% if brasil %}
+			
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="hosted_button_id" value="H55JWM84R2GJA">
+			<table>
+			<tr><td><input type="hidden" name="on0" value="Carregar Creditos">Carregar Creditos</td></tr><tr><td><select name="os0">
+				<option value="500">500 Cr&eacute;ditos 5,00 EUR</option>
+				<option value="1000">1000 Cr&eacute;ditos 10,00 EUR</option>
+				<option value="1500">1500 Cr&eacute;ditos 15,00 EUR</option>
+				<option value="2500">2500 Cr&eacute;ditos 25,00 EUR</option>
+				<option value="5000">5000 Cr&eacute;ditos 50,00 EUR</option>
+			</select> </td></tr>
+			</table>
+				<input type="hidden" name="currency_code" value="EUR">
+				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+				<img alt="" border="0" src="https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif" width="1" height="1">
+				</form>
+				<br></br>
+				<h3><b>Caso pretenda carregar o valor exacto da sua compra entre em contacto connosco para <a href="mailto:Payments@mtgchance.com">payments@mtgchance.com</a><b></h3>
+			
+			
+			{% endif %}
+		
+	<p></p>
+	{% endif %}
+												<h4>Muito obrigado.</h4>
+												
+	<br></br>
+	
+	<div id="option_display">
+
+
+	</div>
+	
+				
+{% endif %}					
+		
+</div>
+{% endblock %}	
+
+	

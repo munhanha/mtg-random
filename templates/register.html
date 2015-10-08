@@ -1,0 +1,292 @@
+{% extends "main_base.html" %}
+
+
+{% block javascript %}
+
+function success(message) {
+	
+		$('#erros').html('<div class="alert alert-success"><button class="close" data-dismiss="alert">x</button><strong>Sucesso: </strong>'+ message +'</div>');
+     
+	}
+	
+	function error(message) {
+	
+		$('#erros').html('<div class="alert alert-error"><button class="close" data-dismiss="alert">x</button><strong>Erro: </strong>'+ message +'</div>');
+     
+	}
+
+function disable_all_buttons() {
+	$('#submit').attr("disabled", true);
+}	
+function enable_all_buttons() {
+	$('#submit').attr("disabled", false);
+}
+
+//Validates an email	
+function validate_email(email) {
+ 
+   var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+   if(reg.test(email) == false) {
+      return false;
+   }
+   return true;
+}	
+
+//validades if numeric
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}	
+	
+//Validates Form and sends to server if all is ok
+function ValidateFormAndSend(){
+
+	$('#wrong_password').html("");
+	$('#wrong_password2').html("");
+	$('#wrong_email').html("");
+	$('#wrong_nome').html("");
+	$('#wrong_morada').html("");
+	$('#wrong_telefone').html("");
+	$('#wrong_codigopostal').html("");
+	$('#erros_server').html("");
+
+	var email = document.getElementById("email").value;	
+	var password = document.getElementById("password").value;
+	var password2 = document.getElementById("password2").value;
+	var nome = document.getElementById("nome").value;
+	var morada = document.getElementById("morada").value;
+	var telefone = document.getElementById("telefone").value;
+	var codigopostal = document.getElementById("codigopostal").value;
+	var codigopostal2 = document.getElementById("codigopostal2").value;
+	var pais = document.getElementById("pais").value;
+	
+	
+	if (email == ""){
+		error("Email obrigat&oacute;rio.");
+		//$('#wrong_email').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (password == ""){
+		error("Password obrigat&oacute;ria.");
+		//$('#wrong_password').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (password2 == ""){
+		error("Confirma&ccedil;&atilde;o de password obrigat&oacute;ria.");
+		//$('#wrong_password2').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (nome == ""){
+		error("Campo nome n&atilde;o preenchido");
+		//$('#wrong_nome').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (morada == ""){
+		error("Campo morada n&atilde;o preenchido");
+		//$('#wrong_morada').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (telefone == ""){
+		error("Campo telefone n&atilde;o preenchido");
+		//$('#wrong_telefone').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+	
+	if (codigopostal == "" || codigopostal2 == ""){
+		error("Campo c&oacute;digo postal n&atilde;o preenchido");
+		//$('#wrong_codigopostal').html("Campo obrigat&oacute;rio.");
+		return;
+	}
+
+	if (password != password2){
+		error("As passwords n&atilde;o s&atilde;o iguais.");
+		//$('#wrong_password').html("As passwords n&atilde;o s&atilde;o iguais");
+		//$('#wrong_password2').html("As passwords n&atilde;o s&atilde;o iguais");
+		return;
+	}
+	
+	if(password.length < 6){
+		error("Password demasiado curta, m&iacute;nimo 6 caracteres");
+		//$('#wrong_password').html("Password demasiado curta, m&iacute;nimo 6 caracteres");
+		//$('#wrong_password2').html("Password demasiado curta, m&iacute;nimo 6 caracteres");	
+		return;
+	}
+	
+	if(telefone.length < 9){
+		error("Telefone demasiado curto, m&iacute;nimo 9 digitos");
+		//$('#wrong_telefone').html("Telefone demasiado curto, m&iacute;nimo 9 digitos");
+		return;
+	}
+	
+	
+	if (!validate_email(email)){
+		error("O email est&aacute; incorrecto");
+		//$('#wrong_email').html("O email est&aacute; incorrecto");
+		return;
+	}
+	
+	if (!isNumber(telefone)) {
+		error("Campo telefone s&oacute; aceita num&eacute;ricos");
+		//$('#wrong_telefone').html("Campo s&oacute; aceita num&eacute;ricos");
+		return;
+	}
+	
+	if (!isNumber(codigopostal) || !isNumber(codigopostal2)){
+		error("Campo c&oacute;digo postal  s&oacute; aceita num&eacute;ricos");
+		//$('#wrong_codigopostal').html("Campo s&oacute; aceita num&eacute;ricos.");
+		return;
+	}
+	disable_all_buttons();
+	$.post("/addUser_temp", 
+	{ email: email , password: password , nome: nome , morada: morada , codigopostal: codigopostal , codigopostal2: codigopostal2 , telefone: telefone , pais: pais},
+	function(data) {
+		enable_all_buttons();
+	
+		//Sucesso
+		if (data == "Success"){
+			window.location = "waiting_register_confirmation.html";
+			return;
+		}
+		
+		//Erro
+		error(data);
+		//$('#erros_server').html(data);
+		
+		});
+}
+
+
+
+{% endblock %}
+
+
+
+{% block body %}
+
+
+<div class="span8">
+
+
+	<table class="table">
+        
+        <tbody>
+          <tr>
+            <td>E-Mail: </td>
+            <td><input class="input-large search-query" id="email" type="email" maxlength="70"></td>
+            <!--td><span id="wrong_email" class="label label-important"></span></td-->
+            
+          </tr>
+          <tr>
+            <td>Password: </td>
+            <td><input class="input-medium search-query" id="password" type="password" maxlength="16"></td>
+            <!--td><span id="wrong_password" class="label label-important"></span></td-->
+          </tr>
+		  
+		  
+          <tr>
+            <td>Confirma&ccedil;&atilde;o Password: </td>
+            <td><input class="input-medium search-query" id="password2" type="password" maxlength="16"></td>
+            <!--td><span id="wrong_password2" class="label label-important"></span></td-->  
+          </tr>
+		  
+		  <tr>
+            <td>Nome Completo: </td>
+            <td><input class="input-xlarge search-query" id="nome" type="text" maxlength="50"></td>
+            <!--td><span id="wrong_nome" class="label label-important"></span></td-->
+          </tr>
+		  
+		  <tr>
+            <td>Morada: </td>
+            <td><input class="input-xlarge search-query" id="morada" type="text" maxlength="80"></td>
+            <!--td><span id="wrong_morada" class="label label-important"></span></td-->  
+          </tr>
+		  
+		  <tr>
+            <td>C&oacute;digo Postal: </td>
+            <td><input class="input-mini search-query" id="codigopostal" type="text" maxlength="6"> - 
+			<input class="input-mega-mini search-query" id="codigopostal2" type="text" maxlength="4"></td>
+            <!--td><span id="wrong_codigopostal" class="label label-important"></span></td-->
+          </tr>
+		  
+		  <tr>
+            <td>Telefone: </td>
+            <td><input class="input-medium search-query" id="telefone" type="text" maxlength="80"></td>
+            <!--td><span id="wrong_telefone" class="label label-important"></span></td-->
+          </tr>
+		  
+		  <tr>
+            <td>Pa&iacute;s: </td>
+            <td> <select id="pais" class="span2">
+					<option>Portugal</option>
+					<option>Brasil</option>
+				</select></td>
+          </tr>
+		  
+		  
+		  
+        </tbody>
+      </table>
+
+
+
+	<!--div>	
+	E-Mail: <input class="input-large search-query" id="email" type="email" maxlength="30"> <span id="wrong_email" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Password: <input class="input-medium search-query" id="password" type="password" maxlength="16"> <span id="wrong_password" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Confirma&ccedil;&atilde;o Password: <input class="input-medium search-query" id="password2" type="password" maxlength="16"> <span id="wrong_password2" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Nome Completo: <input class="input-xlarge search-query" id="nome" type="text" maxlength="50"> <span id="wrong_nome" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Morada: <input class="input-xlarge search-query" id="morada" type="text" maxlength="80"> <span id="wrong_morada" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	C&oacute;digo Postal: <input class="input-mini search-query" id="codigopostal" type="text" maxlength="6"> - 
+	<input class="input-mega-mini search-query" id="codigopostal2" type="text" maxlength="3"> <span id="wrong_codigopostal" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Telefone: <input class="input-medium search-query" id="telefone" type="text" maxlength="80"> <span id="wrong_telefone" class="label label-important"></span>
+	</div>
+	<p></p>
+	<div>
+	Pa&iacute;s: <select id="pais" class="span2">
+        <option>Portugal</option>
+        <option>Brasil</option>
+        </select>
+	</div-->
+	
+	<p></p>
+	
+	<button onclick="ValidateFormAndSend()" id="submit" class="btn btn-primary">Submeter</button>
+	
+	
+	</div>
+	
+	<br></br>
+	
+	<div class="span5" id="erros">
+	
+		
+	
+	</div>
+
+
+
+{% endblock %}
+
+
+

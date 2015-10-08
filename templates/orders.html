@@ -1,0 +1,107 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+
+{% endblock %}
+
+
+
+
+{% block ver_historico_active %}
+	
+	<li class="active"><a href="orders">Ver hist&oacute;rico</a></li>
+
+{% endblock %}
+
+
+{% block under_menu %}	
+
+	
+{% endblock %}
+
+
+{% block main_page_body %}
+
+	
+
+
+	<div class="span8">
+	
+
+	{% if no_orders %}
+		<h2>{{no_orders|safe}}</h2>
+	
+	
+	{% else %}
+	<!--table class="table table" border="0">
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>M&eacute;todo</th>
+            <th>Estado</th>
+			<th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+			{% for order in orders %}
+			<tr>
+			<td>#{{order.codigo}}</td>
+            <td>Correio {{order.metodo}}</td>
+            <td>{{order.estado}}</td>
+            <td>{{order.date}}</td>
+          </tr>
+			{% endfor %}
+        </tbody>
+      </table-->
+	  
+	  
+		<table class="table table" border="0">
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>M&eacute;todo</th>
+            <th>Estado</th>
+			<th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+			{% for order in orders %}
+			<tr>
+			<td>
+	  
+	<div class="accordion">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{forloop.counter}}">
+                  #{{order.codigo}}
+                </a>
+              </div>
+              <div id="collapse{{forloop.counter}}" class="accordion-body collapse" style="height: 0px; ">
+                <div class="accordion-inner">
+					{% for carta in order.cartas %}
+						
+						{{carta}} <p></p>
+						
+					{% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+	  
+	  
+	  </td>
+            <td>Correio {{order.metodo}}</td>
+            <td>{{order.estado}}</td>
+            <td>{{order.date}}</td>
+          </tr>
+			{% endfor %}
+        </tbody>
+      </table>   
+	{% endif %}	  
+	</div>
+
+
+
+{% endblock %}

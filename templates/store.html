@@ -1,0 +1,375 @@
+{% extends "main_page_base.html" %}
+
+
+{% block javascript %}
+
+
+function disable_all_buttons() {
+	$(":input").attr("disabled","true");
+	$("#search_card_button").attr("disabled","true");
+}
+
+function enable_all_buttons() {
+	$(':input').attr("disabled", false);
+	$('#search_card_button').attr("disabled", false);
+}
+
+function cleanTable() {
+	$('#card_holder').empty();
+}
+
+function display_loading(){
+	document.getElementById('isLoading').style.display = '';
+}
+
+function undisplay_loading(){
+	document.getElementById('isLoading').style.display = 'none';
+}
+
+
+function makeButton(stock, name , edition, id){
+
+	if(stock > 0){
+	
+		button = button + "</select>";
+		var button = "<button id=\"card_" + id + "\" onclick=\"add_card_to_cart(this)\" name=\"" +name+ "\" edition=\""+ edition +"\" class=\"btn btn-primary\">Add to <i class=\"icon-shopping-cart icon-white\"></i></button>";
+		
+		button = button +"&nbsp;&nbsp;";
+		button = button +"<p></p>";
+		
+		button = button + "<select id=\"card_quantity_" + id + "\"  class=\"span1\">";
+		
+		for (k = 0 ; k < stock ; k++){
+			var value = k+1;
+			button = button + "<option>" + value + "</option>";
+			if(k == 3)
+				break;
+		}	
+		return button;	
+	}
+	else { 
+		var button =  "<button class=\"btn btn-danger\" disabled=\"true\">Esgotado</button>"
+		button = button + "</ul>"
+		return button;
+	}
+}
+
+function jsonObjToTable(data,id){
+
+	var name = data.name;
+	var edition = data.edition;
+	var colour = data.colour;
+	var power_res = data.power_res;
+	var raridade = data.raridade;
+	var stock = data.stock;
+	var type = data.type;
+	var cost = data.cost;
+	var price = data.preco;
+	var text = data.texto;
+	var preco_conversao = data.preco_conversao;
+	
+	var OPEN_NEW_ROW = "<tr>";
+	var CLOSE_NEW_ROW = "</tr>";
+	var OPEN_NEW_VALUE = "<th><h5>";
+	var CLOSE_NEW_VALUE = "</h5></th>";
+
+	
+	card_info = OPEN_NEW_ROW 
+	
+	card_info = card_info + OPEN_NEW_VALUE + "<a href=\"http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name="+ name +"&amp;size=small&amp;options=\" target=\"_blank\"><img id=\"big_card\" height=\"80\" width=\"80\" src=\"http://gatherer.wizards.com/Handlers/Image.ashx?type=card&amp;name="+ name +"&amp;size=small&amp;options=\" alt=\"Common_back\"></a>"  + CLOSE_NEW_VALUE
+	//card_info = card_info + "<center>" + OPEN_NEW_VALUE + name + CLOSE_NEW_VALUE + "</center>"
+	
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + "<a onmouseover=\"display_info(this)\" id=\""+ id +"\"rel=\"popover\" data-content=\""+ text +"\">" + name + "</a>" + CLOSE_NEW_VALUE + "</center>"
+
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + edition + CLOSE_NEW_VALUE + "</center>"
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + raridade + CLOSE_NEW_VALUE + "</center>"
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + type + CLOSE_NEW_VALUE + "</center>"
+	//	card_info = card_info + "<center>" + OPEN_NEW_VALUE + colour + CLOSE_NEW_VALUE + "</center>"
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + cost + CLOSE_NEW_VALUE + "</center>"
+	//card_info = card_info + "<center>" + OPEN_NEW_VALUE + power_res + CLOSE_NEW_VALUE + "</center>"
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + stock + CLOSE_NEW_VALUE + "</center>"
+	card_info = card_info + "<center>" + OPEN_NEW_VALUE + price + " Cr&eacute;ditos" + "<p></p> igual a <p></p>" + preco_conversao + CLOSE_NEW_VALUE + "</center>"
+	
+	card_info = card_info + OPEN_NEW_VALUE + makeButton(stock,name,edition,id) + CLOSE_NEW_VALUE;
+	
+	card_info = card_info + CLOSE_NEW_ROW
+	
+	$('#card_holder').append(card_info);
+	
+	
+}
+
+
+function print_zero_card(){
+
+	cleanTable();
+	$('#info').html("");
+	
+	var error = "<div class=\"alert alert-error\">"
+    error = error + "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>"
+	error = error + "<strong>Aviso:</strong> A sua pesquisa n&atilde;o devolveu qualquer resultado. <p></p> Se desejar entre em contacto connosco e obtenha um or&ccedil;amento da carta(s) no espa&ccedil;o maximo de 48 horas."
+	error = error + "</div>"
+	
+	$('#info').html(error);
+	
+}
+
+function print_error(server_error){
+	
+	$('#info').html("");
+	
+	var error = "<div class=\"alert alert-error\">"
+    error = error + "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>"
+	error = error + "<strong>Aviso:</strong> " + server_error
+	error = error + "</div>"
+	
+	$('#info').html(error);
+	
+}
+
+function print_success(server_success){
+	
+	$('#info').html("");
+	
+	var success = "<div class=\"alert alert-success\">"
+    success = success + "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>"
+	success = success + "<strong>Aviso:</strong> " + server_success
+	success = success + "</div>"
+	
+	$('#info').html(success);
+	
+}
+
+function change_card_quantity(quantity){
+
+	$('#total_card_number').html(quantity);
+
+}
+
+function search_card() {
+
+
+disable_all_buttons();
+$('#info').html("");
+$('#card_table').fadeIn("slow");
+$('#card_holder').fadeOut("slow");
+cleanTable();
+
+var keywords = document.getElementById("search_params").value;
+var edition = document.getElementById("edition").value;
+
+var colour = document.getElementById("colour").value;
+
+	display_loading();
+
+	$.post("/user_search_cards", 
+		{ keywords: keywords , edition: edition, colour: colour},
+		function(data) {
+		
+			enable_all_buttons();
+			undisplay_loading();
+			
+			if(data.number_cards == 0)
+				print_zero_card();
+			
+			else{
+				for(i = 0 ; i < data.number_cards ; i++){
+					var number = i;
+					var card = "card" + (i+1);				
+					jsonObjToTable(data.cards[card],i);
+					console.log(data.number_cards);
+				}
+			}
+		
+		$('#card_holder').fadeIn("slow");
+			
+	});
+}
+
+
+function display_info(obj) {
+
+	var id = obj.getAttribute("id");
+	$('#'+id).popover('show');
+
+
+}
+
+function add_card_to_cart(obj){
+
+disable_all_buttons();
+//$('#info').html("");
+
+var card_id = obj.getAttribute("id");
+var card_name = obj.getAttribute("name");
+var card_edition = obj.getAttribute("edition");
+
+var id = card_id.replace("card_","card_quantity_");
+var card_quantity = document.getElementById(id).value;
+
+
+$.post("/user_add_to_cart", 
+		{ card_name: card_name, card_edition:card_edition, card_quantity:card_quantity},
+		function(data) {
+		
+		enable_all_buttons();
+		
+		if(data.error != null)
+			print_error(data.error);
+		
+		if(data.success != null){
+			print_success(data.success);
+			change_card_quantity(data.total_number_cards);
+		}
+		
+		});
+
+
+}
+
+function runScript(e) {	
+    if (e.keyCode == 13) {
+		search_card();
+    }
+}
+
+
+
+
+{% endblock %}	
+
+
+{% block store_active %}
+
+	<li class="active"><a href="main">Loja</a></li>
+
+{% endblock %}
+
+
+{% block under_menu %}	
+
+<center><h4> <i class="icon-shopping-cart icon-black"></i> : <a href="view_cards" id="total_card_number">{{ numero_cartas }}</a> cartas</h4></center>
+
+<p></p>
+
+<center><a class="btn btn-large btn-info " href="view_cards"><i class="icon-shopping-cart icon-white"></i> Carrinho</a>	</center>
+	
+{% endblock %}
+
+{% block comprar_cartas_store_active %}
+
+	<li class="active"><a href="store">Comprar Cartas (Store) </a></li>
+	
+{% endblock %}
+
+
+{% block main_page_body %}
+
+
+<div class="span9">
+
+
+<center>
+
+<div class="well">
+  Procurar cartas: 
+  <input type="text" id="search_params" class="input-large search-query" placeholder="Procura de cartas" onkeypress="return runScript(event)">
+  <button class="btn btn-primary" onclick="search_card()" id="search_card_button"> Procurar </button>
+  <img id="helper" onmouseover="display_info(this)" rel="popover" data-content="<strong> Dicas para procura: </strong> Pode incluir qualquer palavra que exista na carta na sua procura. <strong>Ex:</strong> Rare Art Zendikar double strike (Artefacto Raro de Zendikar que tenha Double strike), ou Eldrazi Monument. (ordem das palavras n&atilde;o &eacute; importante) <strong> Cores: </strong> B -> Black. W -> White. G -> Green. R -> Red. &#160;U -> Blue. <strong>Limita&ccedil;&atilde;o: </strong> Qualquer pesquisa s&oacute; ir&aacute; devolver {{number_results}} resultados." src="img/help.gif"/>
+  <img id="isLoading" src="img/loading.gif" style="display:none" alt="Smiley face"/>
+  
+  <hr>
+  
+  <p></p>
+    <td> Edi&ccedil;&atilde;o: </td>
+    <td> <select id="edition" class="span2" onkeypress="return runScript(event)">
+		<option value="">Magic the Gathering</option>
+		<!--option class="divider" value="">--------------------</option>
+		<option value="Lorwyn">Lorwyn</option>
+		<option value="Morningtide">Morningtide</option>
+		<option class="divider" value="">--------------------</option>
+		<option value="Shadowmoor">Shadowmoor</option>
+		<option value="Eventide">Eventide</option-->
+		<option class="divider" value="">--------------------</option>
+		<option value="Shards of Alara">Shards of Alara</option>
+		<option value="Conflux">Conflux</option>
+		<option value="Alara Reborn">Alara Reborn</option>
+		<option class="divider" value="">--------------------</option>
+		<option value="Zendikar">Zendikar</option>
+		<option value="Worldwake">Worldwake</option>
+		<option value="Rise of the Eldrazi">Rise of the Eldrazi</option>
+		<option class="divider" value="">--------------------</option>
+		<option value="Scars of Mirrodin">Scars of Mirrodin</option>
+		<option value="Mirrodin Besieged">Mirrodin Besieged</option>
+		<option value="New Phyrexia">New Phyrexia</option>
+		<option class="divider" value="">--------------------</option>
+		<option value="Innistrad">Innistrad</option>
+		<option value="Dark Ascension">Dark Ascension</option>
+		<option value="Avacyn Restored">Avacyn Restored</option>
+		<option class="divider" value="">--------------------</option>
+		<!--option value="5th Edition">5th Edition</option-->
+		<option value="2011 Core Set (M11)">2011 Core Set (M11)</option>
+		<option value="2012 Core Set (M12)">2012 Core Set (M12)</option>
+		<option value="2013 Core Set (M13)">2013 Core Set (M13)</option>
+	</select></td>
+	
+	<td> Cor: </td>
+    <td> <select id="colour" class="span2" onkeypress="return runScript(event)">
+		<option value="">All Colours</option>
+		<option value="B">Black</option>
+		<option value="W">White</option>
+		<option value="G">Green</option>
+		<option value="R">Red</option>
+		<option value="U">Blue</option>
+		<option value="Art">Artifact</option>
+		<option value="Lnd">Land</option>
+		<option value="Gld">Golden/Hybrid</option>
+	</select></td>
+	
+  </div>
+</center>
+
+
+<div id="info">	
+</div> 
+
+	
+
+
+<div id="card_list">
+
+<hr>
+
+
+
+<table class="table table-condensed" id="card_table" style="display:none">
+        <thead>
+          <tr>
+			<th>#</th>
+            <th>Nome</th>
+            <th>Edi&ccedil;&atilde;o</th>
+            <th>Raridade</th>
+            <th>Tipo</th>
+            <!--th>Cor</th-->
+            <th>Custo</th>
+            <!--th>Poder/Resist&ecirc;ncia</th-->
+            <th>Stock</th-->
+            <th>Pre&ccedil;o</th>
+            <th></th>
+          </tr>
+        </thead>
+		
+		
+        <tbody id="card_holder" style="display:none">
+          
+        </tbody>
+      </table>
+	  
+</div>
+
+</div>
+
+
+{% endblock %}	
+
+	

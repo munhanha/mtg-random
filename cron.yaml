@@ -1,0 +1,4 @@
+cron:
+- description: chance user cards(cartas sistema)
+  url: /change_user_cards
+  schedule: every 12 hours
